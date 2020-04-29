@@ -1,0 +1,151 @@
+﻿<!doctype html>
+<html>
+
+<head>
+    <meta charset="EUC-KR">
+</head>
+<script type="text/javascript" src="jquery-1.11.2.min.js"></script>
+<script type="text/javascript" src="Mois_InziJS.js"></script>
+
+<script language="javascript">
+    function sendDataToServer() {
+        var param = document.getElementById("jsParam").value;
+        var resultInput = document.getElementById("jsResult");
+
+        alert("전달 되는 데이터 : " + param);
+
+        InziEXE_GetReturn(param, function(result) {
+
+            alert("전달 받은 데이터 : " + result);
+            resultInput.value = result;
+        });
+    }
+
+    function ExcuteTESTScan() {
+        var resultInput = document.getElementById("jsResult");
+        var imageDiv = document.getElementById("jsImage");
+
+        var paramData = {
+            SystemDate: new Date(),
+            InputDate: new Date(),
+            User: "최하영",
+            Jumin: "123456-1234567"
+        }
+
+        var testScanInterface_Request = {
+            EXEKIND: 0,
+            COMMAND: "start",
+            PARAM: paramData
+        }
+
+        var requestData = JSON.stringify(testScanInterface_Request);
+
+        alert("TESTScan 실행 명령.\n전달 되는 데이터 : " + requestData);
+
+        InziEXE_GetReturn(requestData, function(result) {
+            alert("전달 받은 데이터 \n: " + result);
+            resultInput.value = result;
+
+            var testScanInterface_Response = JSON.parse(result);
+            var RESULT = testScanInterface_Response.RESULT;
+            console.log(testScanInterface_Response);
+            var scanDate = RESULT.ScanDate;
+            var cropFilePath = RESULT.CropFilePath;
+
+            var imgTag = document.createElement("img");
+            imgTag.src = cropFilePath;
+            imgTag.alt = "증명사진";
+
+            imageDiv.appendChild(imgTag);
+        });
+    }
+
+    function CloseTESTScan() {
+        var resultInput = document.getElementById("jsResult");
+        var imageDiv = document.getElementById("jsImage");
+
+        var testScanInterface_Request = {
+            EXEKIND: 0,
+            COMMAND: "close",
+            PARAM: null
+        }
+
+        var requestData = JSON.stringify(testScanInterface_Request);
+
+        InziEXE_GetReturn(requestData, function(result) {
+            resultInput.value = result;
+            var testScanInterface_Response = JSON.parse(result);
+            var RESULT = testScanInterface_Response.RESULT;
+            if (RESULT.ErrorStatus) {
+                alert("error 발생. " + RESULT.ErrorMsg);
+            } else {
+                alert("종료성공");
+            }
+        })
+    }
+
+
+    function InterfaceExample() {
+        // EXE에 전달 할 데이터(Param) -> 각 EXE마다 정의 필요. 
+        // TEST 프로그램은 다음과 같이 구성
+        var paramData = {
+            SystemDate: new Date(),
+            InputDate: new Date(),
+            User: "홍길동",
+            Jumin: "123456-1234567"
+        }
+
+        // AJAX Request로 전달 될 Interface 객체
+        var Interface_Request = {
+            EXEKIND: 0, // 사용할 EXE 종류 (0 : TEST, 1 : 화상스캔, 2 : 신분증 진위확인, 3 : 서명, 4 : 십지지문)
+            COMMAND: "start", // 명령어 (start : 실행 ... 추후 구현 가능)
+            PARAM: paramData // 명령어에 대한 파라미터 
+        }
+
+        // Local Web Server에 위 Interface 데이터를 전달 하기 위해서는 JSON String형태로 보내야 됨.
+        var requestData = JSON.stringify(Interface_Request);
+
+        // requestData 전달 및 callback 함수를 통해 결과값 받기.
+        InziEXE_GetReturn(requestData, function(result) {
+            // 결과값으로 전달받을 Interface 데이터 또한 각 EXE마다 정의가 필요하며,
+            // JsonString 형태로 전달됨.
+            var result = JSON.parse(result);
+            var Interface_Response = result.RESULT; // 전달된 JSON의 RESULT값이 결과값으로 정해야 될 Interface
+
+            // 각 Interface에 정의된 키 값으로 결과 값을 얻을 수 있음.
+            // TEST 프로그램은 다음과 같이 구성
+            var scanDate = Interface_Response.ScanDate;
+            var cropFilePath = Interface_Response.CropFilePath;
+
+            // To Do Next...
+        });
+    }
+</script>
+
+<body>
+    <script>
+        document.characterSet = "EUC-KR";
+        document.write("<p>document.characterSet : " + document.characterSet + "</p>");
+    </script>
+    <button onclick=InziEXE_Init()>INZI_MoisAgent Init</button>
+    <table>
+        <tr>
+            <td><input value="웹서버로 Data 보내기" type=button style=width:150px onclick=sendDataToServer()></td>
+        </tr>
+        <tr>
+            <td>parameter : <input id="jsParam" name="tb_param" type="text" style=width:1000px height:50px value="parameter is here" placeholder="test"></td>
+        </tr>
+        <tr>
+            <td>result : <input id="jsResult" name="tb_result" type="text" style=width:1500px value="return value is written here"></td>
+        </tr>
+    </table>
+
+    <br>
+
+    <button onclick=ExcuteTESTScan()>TEST EXE 실행</button>
+    <button onclick=CloseTESTScan()>TEST EXE 종료</button>
+    <div id="jsImage">
+        <br>
+</body>
+
+</html>
