@@ -1,6 +1,0 @@
-D:\행정안전부_신분증차세대\개발\HYWebServer\ServerInterface\bin\Release\ServerInterface.dll
-D:\행정안전부_신분증차세대\개발\HYWebServer\ServerInterface\bin\Release\ServerInterface.pdb
-D:\행정안전부_신분증차세대\개발\HYWebServer\ServerInterface\bin\Release\Newtonsoft.Json.dll
-D:\행정안전부_신분증차세대\개발\HYWebServer\ServerInterface\obj\Release\HYWebServer_Interface.csprojResolveAssemblyReference.cache
-D:\행정안전부_신분증차세대\개발\HYWebServer\ServerInterface\obj\Release\ServerInterface.dll
-D:\행정안전부_신분증차세대\개발\HYWebServer\ServerInterface\obj\Release\ServerInterface.pdb

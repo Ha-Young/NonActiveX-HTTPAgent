@@ -1,0 +1,743 @@
+﻿<!doctype html>
+<html>
+
+<head>
+    <meta charset="EUC-KR">
+</head>
+<script type="text/javascript" src="jquery-1.11.2.min.js"></script>
+<script type="text/javascript" src="HY_InziJS.js"></script>
+
+<script language="javascript">
+    function sendDataToServer() {
+        var param = document.getElementById("jsParam").value;
+
+        alert("전달 되는 데이터 :" + param);
+
+        InziEXE_GetReturn(param, function(result) {
+            var RESULT = testScanInterface_Response.RESULT;
+            if (RESULT.errorStatus && RESULT.errorStatus == 0) {
+                InziEXE_Init();
+            }
+        });
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////     TEST SCAN      //////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    function ExcuteTESTScan(isJsonp) {
+        var systemDate = document.getElementById("js-test-SystemDate").value;
+        var inputDate = document.getElementById("js-test-InputDate").value;
+        var user = document.getElementById("js-test-User").value;
+        var jumin = document.getElementById("js-test-Jumin").value;
+
+        var resultInput = document.getElementById("js-test-Result");
+
+        var paramData = {
+            SystemDate: systemDate,
+            InputDate: inputDate,
+            User: user,
+            Jumin: jumin
+        }
+
+        var testScanInterface_Request = {
+            EXEKIND: 0,
+            COMMAND: "start",
+            PARAM: paramData
+        }
+
+        var requestData = JSON.stringify(testScanInterface_Request);
+
+        alert("TESTScan 실행 명령.\n전달 되는 데이터 : " + requestData);
+
+        if (isJsonp) {
+            InziEXE_GetReturn_jsonp(requestData, function(result) {
+                alert("전달 받은 데이터 \n: " + result);
+                resultInput.value = result;
+
+                var testScanInterface_Response = JSON.parse(result);
+                var RESULT = testScanInterface_Response.RESULT;
+                console.log(testScanInterface_Response);
+
+                set_TEST_HTML(RESULT);
+            });
+        } else {
+            InziEXE_GetReturn(requestData, function(result) {
+                alert("전달 받은 데이터 \n: " + result);
+                resultInput.value = result;
+
+                var testScanInterface_Response = JSON.parse(result);
+                var RESULT = testScanInterface_Response.RESULT;
+                console.log(testScanInterface_Response);
+
+                set_TEST_HTML(RESULT);
+            });
+        }
+    }
+
+    function CloseTESTScan() {
+        var resultInput = document.getElementById("js-test-Result");
+
+        var testScanInterface_Request = {
+            EXEKIND: 0,
+            COMMAND: "close",
+            PARAM: null
+        }
+
+        var requestData = JSON.stringify(testScanInterface_Request);
+
+        InziEXE_GetReturn(requestData, function(result) {
+            resultInput.value = result;
+            var testScanInterface_Response = JSON.parse(result);
+            var RESULT = testScanInterface_Response.RESULT;
+            if (RESULT.ErrorStatus) {
+                alert("error 발생. " + RESULT.ErrorMsg);
+            } else {
+                alert("종료성공");
+            }
+        })
+    }
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////     Mois SCAN      //////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    function ExcuteMoisScan(isJsonp) {
+        var systemDate = document.getElementById("js-scan-SystemDate").value;
+        var inputDate = document.getElementById("js-scan-InputDate").value;
+        var name = document.getElementById("js-scan-Name").value;
+        var juminNum = document.getElementById("js-scan-JuminNum").value;
+        var scanKind = parseInt(document.getElementById("js-scan-ScanKind").value);
+        var isNative = parseInt(document.getElementById("js-scan-IsNative").value);
+
+        var resultInput = document.getElementById("js-scan-Result");
+
+        var paramData = {
+            SystemDate: systemDate,
+            InputDate: inputDate,
+            Name: name,
+            JuminNum: juminNum,
+            IsNative: isNative,
+            ScanKind: scanKind
+        }
+
+        var MoisScanInterface_Request = {
+            EXEKIND: 1,
+            COMMAND: "start",
+            PARAM: paramData
+        }
+
+        var requestData = JSON.stringify(MoisScanInterface_Request);
+
+        alert("MoisScan 실행 명령.\n전달 되는 데이터 : " + requestData);
+
+        if (isJsonp) {
+            InziEXE_GetReturn_jsonp(requestData, function(result) {
+                alert("전달 받은 데이터 \n: " + result);
+                resultInput.value = result;
+
+                var MoisScanInterface_Response = JSON.parse(result);
+                var RESULT = MoisScanInterface_Response.RESULT;
+                console.log(MoisScanInterface_Response);
+
+                set_SCAN_HTML(RESULT);
+            });
+        } else {
+            InziEXE_GetReturn(requestData, function(result) {
+                alert("전달 받은 데이터 \n: " + result);
+                resultInput.value = result;
+
+                var MoisScanInterface_Response = JSON.parse(result);
+                var RESULT = MoisScanInterface_Response.RESULT;
+                console.log(MoisScanInterface_Response);
+
+                set_SCAN_HTML(RESULT);
+            });
+        }
+
+    }
+
+    function CloseMoisScan() {
+        var resultInput = document.getElementById("js-scan-Result");
+
+        var MoisScanInterface_Request = {
+            EXEKIND: 1,
+            COMMAND: "close",
+            PARAM: null
+        }
+
+        var requestData = JSON.stringify(MoisScanInterface_Request);
+
+        InziEXE_GetReturn(requestData, function(result) {
+            resultInput.value = result;
+            var MoisScanInterface_Response = JSON.parse(result);
+            var RESULT = MoisScanInterface_Response.RESULT;
+            if (RESULT.ErrorStatus) {
+                alert("error 발생. " + RESULT.ErrorMsg);
+            } else {
+                alert("종료성공");
+            }
+        })
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////     Mois IDCheck     //////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    function ExcuteIDCheck(isJsonp) {
+        var idKind = parseInt(document.getElementById("js-idCheck-IDKind").value);
+
+        var resultInput = document.getElementById("js-idCheck-Result");
+
+        var paramData = {
+            IDKind: idKind
+        }
+
+        var IDCheckInterface_Request = {
+            EXEKIND: 2,
+            COMMAND: "start",
+            PARAM: paramData
+        }
+
+        var requestData = JSON.stringify(IDCheckInterface_Request);
+
+        alert("IDCheck 실행 명령.\n전달 되는 데이터 : " + requestData);
+
+        if (isJsonp) {
+            InziEXE_GetReturn_jsonp(requestData, function(result) {
+                alert("전달 받은 데이터 \n: " + result);
+                resultInput.value = result;
+
+                var IDCheckInterface_Response = JSON.parse(result);
+                var RESULT = IDCheckInterface_Response.RESULT;
+                console.log(IDCheckInterface_Response);
+
+                set_IDCHECK_HTML(RESULT);
+            });
+        } else {
+            InziEXE_GetReturn(requestData, function(result) {
+                alert("전달 받은 데이터 \n: " + result);
+                resultInput.value = result;
+
+                var IDCheckInterface_Response = JSON.parse(result);
+                var RESULT = IDCheckInterface_Response.RESULT;
+                console.log(IDCheckInterface_Response);
+
+                set_IDCHECK_HTML(RESULT);
+            });
+        }
+
+    }
+
+    function CloseIDCheck() {
+        var resultInput = document.getElementById("js-scan-Result");
+
+        var IDCheckInterface_Request = {
+            EXEKIND: 2,
+            COMMAND: "close",
+            PARAM: null
+        }
+
+        var requestData = JSON.stringify(IDCheckInterface_Request);
+
+        InziEXE_GetReturn(requestData, function(result) {
+            resultInput.value = result;
+            var IDCheckInterface_Response = JSON.parse(result);
+            var RESULT = IDCheckInterface_Response.RESULT;
+            if (RESULT.ErrorStatus) {
+                alert("error 발생. " + RESULT.ErrorMsg);
+            } else {
+                alert("종료성공");
+            }
+        })
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////     Mois Signiture      //////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    function ExcuteSigniture(isJsonp) {
+        var systemDate = document.getElementById("js-signiture-SystemDate").value;
+        var juminNum = document.getElementById("js-signiture-JuminNum").value;
+
+        var resultInput = document.getElementById("js-signiture-Result");
+
+
+        var paramData = {
+                SystemDate: systemDate,
+                JuminNum: juminNum
+            }
+            //TestScan : 0
+            // SCAN : 1
+            // IDCheck : 2
+            // LiveFinger : 3
+            // Signiture : 4
+        var signiture_Interface_Request = {
+            EXEKIND: 4,
+            COMMAND: "start",
+            PARAM: paramData
+        }
+
+        var requestData = JSON.stringify(signiture_Interface_Request);
+
+        //alert("Signiture(서명) 실행 명령.\n전달 되는 데이터 : " + requestData);
+
+        if (isJsonp) {
+            InziEXE_GetReturn_jsonp(requestData, function(result) {
+                alert("전달 받은 데이터 \n: " + result);
+                resultInput.value = result;
+
+                var signiture_Interface_Response = JSON.parse(result);
+                var RESULT = signiture_Interface_Response.RESULT;
+                console.log(signiture_Interface_Response);
+                set_SIGNITURE_HTML(RESULT);
+            });
+        } else {
+            InziEXE_GetReturn(requestData, function(result) {
+                alert("전달 받은 데이터 \n: " + result);
+                resultInput.value = result;
+
+                var signiture_Interface_Response = JSON.parse(result);
+                var RESULT = signiture_Interface_Response.RESULT;
+                console.log(signiture_Interface_Response);
+                set_SIGNITURE_HTML(RESULT);
+            });
+        }
+
+    }
+
+    function CloseSigniture() {
+        var resultInput = document.getElementById("js-signiture-Result");
+
+
+        var signiture_Interface_Request = {
+            EXEKIND: 4,
+            COMMAND: "close",
+            PARAM: null
+        }
+
+        var requestData = JSON.stringify(signiture_Interface_Request);
+
+        InziEXE_GetReturn(requestData, function(result) {
+            resultInput.value = result;
+            var signiture_Interface_Response = JSON.parse(result);
+            var RESULT = signiture_Interface_Response.RESULT;
+            if (RESULT.ErrorStatus) {
+                alert("error 발생. " + RESULT.ErrorMsg);
+            } else {
+                alert("종료성공");
+            }
+        })
+    }
+
+
+    function InterfaceExample() {
+        // EXE에 전달 할 데이터(Param) -> 각 EXE마다 정의 필요. 
+        // TEST 프로그램은 다음과 같이 구성
+        var paramData = {
+            SystemDate: new Date(),
+            InputDate: new Date(),
+            User: "홍길동",
+            Jumin: "123456-1234567"
+        }
+
+        // AJAX Request로 전달 될 Interface 객체
+        var Interface_Request = {
+            EXEKIND: 0, // 사용할 EXE 종류 (0 : TEST, 1 : 화상스캔, 2 : 신분증 진위확인, 3 : 서명, 4 : 십지지문)
+            COMMAND: "start", // 명령어 (start : 실행 ... 추후 구현 가능)
+            PARAM: paramData // 명령어에 대한 파라미터 
+        }
+
+        // Local Web Server에 위 Interface 데이터를 전달 하기 위해서는 JSON String형태로 보내야 됨.
+        var requestData = JSON.stringify(Interface_Request);
+
+        // requestData 전달 및 callback 함수를 통해 결과값 받기. (jsonp)
+        InziEXE_GetReturn_jsonp(requestData, function(result) {
+            // 결과값으로 전달받을 Interface 데이터 또한 각 EXE마다 정의가 필요하며,
+            // JsonString 형태로 전달됨.
+            var result = JSON.parse(result);
+            var Interface_Response = result.RESULT; // 전달된 JSON의 RESULT값이 결과값으로 정해야 될 Interface
+
+            // 각 Interface에 정의된 키 값으로 결과 값을 얻을 수 있음.
+            // TEST 프로그램은 다음과 같이 구성
+            var scanDate = Interface_Response.ScanDate;
+            var cropFilePath = Interface_Response.CropFilePath;
+
+            // To Do Next...
+        });
+    }
+
+    function setEXETimeoutSample() {
+        var timeOutValue = 1000 * 60 * 60; // 1시간
+        SetEXETimeout(timeOutValue);
+    }
+
+    function JSONPTEST() {
+        var paramData = {
+            SystemDate: "systemDate",
+            InputDate: "inputDate",
+            User: "user",
+            Jumin: "123-123"
+        }
+
+        var testScanInterface_Request = {
+            EXEKIND: 0,
+            COMMAND: "start",
+            PARAM: paramData
+        }
+
+        var requestData = JSON.stringify(testScanInterface_Request);
+
+        alert("TESTScan 실행 명령.\n전달 되는 데이터 : " + requestData);
+
+        InziEXE_GetReturn_jsonp(requestData, function(result) {
+            alert("전달 받은 데이터 \n: " + result);
+            //resultInput.value = result;
+
+            var testScanInterface_Response = JSON.parse(result);
+            var RESULT = testScanInterface_Response.RESULT;
+            console.log(testScanInterface_Response);
+        });
+    }
+
+    //////////////////////////////////////////////////////////////////
+    ////////////////////////private////////////////////////////////////
+    function imageViewBase64(imageTag, imageBase64, extension) {
+        var imgBase64 = "data:image/" + extension + ";base64, " + imageBase64;
+        imageTag.src = imgBase64;
+        imageTag.alt = "Base64Image";
+        imageTag.style = "width:200px;height:200px;";
+    }
+
+    function set_TEST_HTML(RESULT) {
+        var Image = document.getElementById("js-test-Image");
+        var ScanDate = document.getElementById("js-test-ScanDate");
+        var FilePath = document.getElementById("js-test-FilePath");
+        var Return_Val = document.getElementById("js-test-Return_Val");
+        var ErrMsg = document.getElementById("js-test-ErrMsg");
+
+        var importExtension = document.getElementById("js-test-importExtension").value;
+        if (importExtension == null || importExtension === "")
+            importExtension = "bmp";
+
+        imageViewBase64(Image, RESULT.ImageBase64, importExtension);
+
+        ScanDate.value = RESULT.ScanDate;
+        FilePath.value = RESULT.FilePath;
+        Return_Val.value = RESULT.Return_Val;
+        ErrMsg.value = RESULT.ErrMsg;
+    }
+
+    function set_SCAN_HTML(RESULT) {
+        var Image = document.getElementById("js-scan-Image");
+        var ImageExtension = document.getElementById("js-scan-ImageExtension")
+        var ScanDate = document.getElementById("js-scan-ScanDate");
+        var ImgInfo = document.getElementById("js-scan-ImgInfo");
+        var ImgExtractScore = document.getElementById("js-scan-ImgExtractScore");
+        var FingerInfo = document.getElementById("js-scan-FingerInfo");
+        var FingerExtractScore = document.getElementById("js-scan-FingerExtractScore");
+
+        var Return_Val = document.getElementById("js-scan-Return_Val");
+        var ErrMsg = document.getElementById("js-scan-ErrMsg");
+
+
+        imageViewBase64(Image, RESULT.ImageCropBase64, RESULT.ImageCropBase64_Extension);
+        ImageExtension.value = RESULT.ImageCropBase64_Extension;
+
+        ScanDate.value = RESULT.ScanDate;
+        ImgInfo.value = RESULT.ImgInfo;
+        ImgExtractScore.value = RESULT.ImgExtractScore;
+        FingerInfo.value = RESULT.FingerInfo;
+        FingerExtractScore.value = RESULT.FingerExtractScore;
+
+        Return_Val.value = RESULT.Return_Val;
+        ErrMsg.value = RESULT.ErrMsg;
+    }
+
+    function set_IDCHECK_HTML(RESULT) {
+        var IDKind = document.getElementById("js-idCheck-IDKind2");
+        var JuminNum = document.getElementById("js-idCheck-JuminNum")
+        var Name = document.getElementById("js-idCheck-Name");
+        var IssDt = document.getElementById("js-idCheck-IssDt");
+        var lcnsNo = document.getElementById("js-idCheck-lcnsNo");
+        var ImgExtension = document.getElementById("js-idCheck-ImgExtension");
+        var ImgCropInfo = document.getElementById("js-idCheck-ImgCropInfo");
+        var FingerExtension = document.getElementById("js-idCheck-FingerExtension");
+        var FingerCropInfo = document.getElementById("js-idCheck-FingerCropInfo");
+        var LiveFingerExtension = document.getElementById("js-idCheck-LiveFingerExtension");
+        var LiveFingerInfo = document.getElementById("js-idCheck-LiveFingerInfo");
+
+        var Return_Val = document.getElementById("js-idCheck-Return_Val");
+        var ErrMsg = document.getElementById("js-idCheck-ErrMsg");
+
+        var Img = document.getElementById("js-idCheck-Img");
+        var Finger = document.getElementById("js-idCheck-Finger");
+        var LiveFinger = document.getElementById("js-idCheck-LiveFinger");
+
+        Img.src = "";
+        Finger.src = "";
+        LiveFinger.src = "";
+
+        ImgExtension.value = "";
+        FingerExtension.value = "";
+        LiveFingerExtension.value = "";
+
+
+        if (RESULT.ImgCropBase64 != null) {
+            imageViewBase64(Img, RESULT.ImgCropBase64, RESULT.ImgCropBase64_Extension);
+            ImgExtension.value = RESULT.ImgCropBase64_Extension;
+        }
+
+        if (RESULT.FingerCropBase64 != null) {
+            imageViewBase64(Finger, RESULT.FingerCropBase64, RESULT.FingerCropBase64_Extension);
+            FingerExtension.value = RESULT.FingerCropBase64_Extension;
+        }
+
+        if (RESULT.LiveFingerBase64 != null) {
+            imageViewBase64(LiveFinger, RESULT.LiveFingerBase64, RESULT.LiveFingerBase64_Extension);
+            LiveFingerExtension.value = RESULT.LiveFingerBase64_Extension;
+        }
+
+        IDKind.value = RESULT.IDKind;
+        JuminNum.value = RESULT.JuminNum;
+        Name.value = RESULT.Name;
+        IssDt.value = RESULT.IssDt;
+        lcnsNo.value = RESULT.lcnsNo;
+        ImgCropInfo.value = RESULT.ImgCropInfo;
+        FingerCropInfo.value = RESULT.FingerCropInfo;
+        LiveFingerInfo.value = RESULT.LiveFingerInfo;
+
+
+        Return_Val.value = RESULT.Return_Val;
+        ErrMsg.value = RESULT.ErrMsg;
+    }
+
+    function set_SIGNITURE_HTML(RESULT) {
+        var SignitrueBase64 = document.getElementById("js-signiture-SignitrueBase64");
+
+        var Return_Val = document.getElementById("js-signiture-Return_Val");
+        var ErrMsg = document.getElementById("js-signiture-ErrMsg");
+
+        SignitrueBase64.value = RESULT.SignitrueBase64;
+
+        Return_Val.value = RESULT.Return_Val;
+        ErrMsg.value = RESULT.ErrMsg;
+    }
+</script>
+
+<body style="background-color: azure;">
+    <script>
+        document.characterSet = "EUC-KR";
+        document.write("<p>document.characterSet : " + document.characterSet + "</p>");
+    </script>
+    <div style="background-color: cadetblue; padding: 20px;">
+        <span style="color: black; font-weight: 600; font-size: 20px;">InziAgent 실행 -></span>
+        <button onclick=InziEXE_Init() style="width:200px; height:50px; background-color: brown; color: white; font-size: 20px; margin-bottom: 20px;">INZI_MoisAgent Init</button>
+        <table>
+            <tr>
+                <td><input value="웹서버로 Data 보내기 (TEST)" type=button style=width:200px onclick=sendDataToServer()></td>
+            </tr>
+            <tr>
+                <td>parameter : <input id="jsParam " name="tb_param " type="text " style="width:1000px " height:50px value="parameter is here " placeholder="test "></td>
+            </tr>
+        </table>
+    </div>
+    <br>
+    <div class="test" style="background-color: antiquewhite;">
+        <h2>테스트 프로그램</h2>
+        <h3>Request</h3>
+        <label for="js-test-SystemDate">SystemDate</label>
+        <input id="js-test-SystemDate" value="2020-05-22">
+        <label for="js-test-InputDate">InputDate</label>
+        <input id="js-test-InputDate" value="2020-05-22">
+        <label for="js-test-User">User</label>
+        <input id="js-test-User" value="홍길동">
+        <label for="js-test-Jumin">Jumin</label>
+        <input id="js-test-Jumin" value="999999-9999999">
+        <br>
+        <label for="js-test-importExtension">이미지가져오기 할 확장자</label>
+        <input id="js-test-importExtension" value="bmp" style="width: 50px;">
+        <br><br>
+        <button style="width:150px;height:30px;background-color: rgb(100, 228, 100);" onclick=ExcuteTESTScan(false)>TEST EXE 실행</button>
+        <button style="width:150px;height:30px;background-color: rgb(100, 228, 100);" onclick=ExcuteTESTScan(true)>TEST EXE 실행 (jsonp)</button>
+        <button style="width:150px;height:30px;background-color: rgb(243, 115, 115);" onclick=CloseTESTScan()>TEST EXE 종료</button>
+        <br>
+        <h3>Response</h3>
+        <label for="js-test-Result">RESUTL : </label>
+        <textarea id="js-test-Result" style="width:1500px"></textarea>
+        <br>
+        <label for="js-test-Image">IMAGE : </label>
+        <img id="js-test-Image" style="width:200px;height:200px;"></img>
+        <br>
+        <label for="js-test-ScanDate">ScanDate</label>
+        <input id="js-test-ScanDate" value="">
+        <label for="js-test-FilePath">FilePath</label>
+        <input id="js-test-FilePath" value="">
+        <label for="js-test-Return_Val">Return_Val</label>
+        <input id="js-test-Return_Val" value="">
+        <label for="js-test-ErrMsg">ErrMsg</label>
+        <input id="js-test-ErrMsg" value="">
+        <br>
+        <br>
+    </div>
+    <hr>
+    <div class="scan" style="background-color: lightgray;">
+        <h2>화상 입력기 테스트</h2>
+        <h3>Request</h3>
+        <label for="js-scan-SystemDate">SystemDate</label>
+        <input id="js-scan-SystemDate" value="2020-05-22">
+        <label for="js-scan-InputDate">InputDate</label>
+        <input id="js-scan-InputDate" value="2020-05-22">
+        <label for="js-scan-Name">Name</label>
+        <input id="js-scan-Name" value="홍길동">
+        <label for="js-scan-JuminNum">JuminNum</label>
+        <input id="js-scan-JuminNum" value="999999-9999999">
+        <label for="js-scan-IsNative">IsNative</label>
+        <input id="js-scan-IsNative" value="1" style="width: 50px;">
+        <br>
+        <label for="js-scan-ScanKind">ScanKind</label>
+        <input id="js-scan-ScanKind" value="1" style="width: 50px;">
+        <br><br>
+        <button style="width:150px;height:30px;background-color: rgb(100, 228, 100);" onclick=ExcuteMoisScan(false)>화상 입력기 실행</button>
+        <button style="width:150px;height:30px;background-color: rgb(100, 228, 100);" onclick=ExcuteMoisScan(true)>화상 입력기 실행 (jsonp)</button>
+        <button style="width:150px;height:30px;background-color: rgb(243, 115, 115);" onclick=CloseMoisScan()>화상 입력기 종료</button>
+        <br>
+        <h3>Response</h3>
+        <label for="js-scan-Result">RESUTL : </label>
+        <textarea id="js-scan-Result" style="width:1500px"></textarea>
+        <br>
+        <label for="js-scan-Image">IMAGE : </label>
+        <img id="js-scan-Image" style="width:200px;height:200px;"></img>
+        <label for="js-scan-ImageExtension">ImageExtension</label>
+        <input id="js-scan-ImageExtension" style="width: 50px;" value="">
+        <br>
+        <label for="js-scan-ScanDate">ScanDate</label>
+        <input id="js-scan-ScanDate" value="">
+        <br>
+        <label for="js-scan-ImgInfo">ImgInfo</label>
+        <textarea id="js-scan-ImgInfo" style="width:1000px"></textarea>
+        <label for="js-scan-ImgExtractScore">ImgExtractScore</label>
+        <input id="js-scan-ImgExtractScore" value="">
+        <br>
+        <label for="js-scan-FingerInfo">FingerInfo</label>
+        <textarea id="js-scan-FingerInfo" style="width:1000px"></textarea>
+        <label for="js-scan-FingerExtractScore">FingerExtractScore</label>
+        <input id="js-scan-FingerExtractScore" value="">
+        <br>
+        <label for="js-scan-Return_Val">Return_Val</label>
+        <input id="js-scan-Return_Val" value="">
+        <label for="js-scan-ErrMsg">ErrMsg</label>
+        <input id="js-scan-ErrMsg" value="">
+        <br>
+        <br>
+    </div>
+    <hr>
+    <div class="idCheck" style="background-color: antiquewhite;">
+        <h2>본인확인 테스트</h2>
+        <h3>Request</h3>
+        <label for="js-idCheck-IDKind">IDKind</label>
+        <input id="js-idCheck-IDKind" value="0" style="width: 50px;">
+        <br><br>
+        <button style="width:150px;height:30px;background-color: rgb(100, 228, 100);" onclick=ExcuteIDCheck(false)>본인확인 실행</button>
+        <button style="width:150px;height:30px;background-color: rgb(100, 228, 100);" onclick=ExcuteIDCheck(true)>본인확인 실행 (jsonp)</button>
+        <button style="width:150px;height:30px;background-color: rgb(243, 115, 115);" onclick=CloseIDCheck()>본인확인 종료</button>
+        <br>
+        <h3>Response</h3>
+        <label for="js-idCheck-Result">RESUTL : </label>
+        <textarea id="js-idCheck-Result" style="width:1500px"></textarea>
+        <br>
+        <label for="js-idCheck-Img">IMAGE : </label>
+        <img id="js-idCheck-Img" style="width:200px;height:200px;"></img>
+        <label for="js-idCheck-Finger">Finger : </label>
+        <img id="js-idCheck-Finger" style="width:200px;height:200px;"></img>
+        <label for="js-idCheck-LiveFinger">LiveFinger : </label>
+        <img id="js-idCheck-LiveFinger" style="width:200px;height:200px;"></img>
+        <br>
+        <label for="js-idCheck-ImgExtension">ImgExtension</label>
+        <input id="js-idCheck-ImgExtension" value="">
+        <label for="js-idCheck-FingerExtension">FingerExtension</label>
+        <input id="js-idCheck-FingerExtension" value="">
+        <label for="js-idCheck-LiveFingerExtension">LiveFingerExtension</label>
+        <input id="js-idCheck-LiveFingerExtension" value="">
+        <br>
+        <br><br>
+        <label for="js-idCheck-IDKind2">Return IDKind</label>
+        <input id="js-idCheck-IDKind2" value="">
+        <label for="js-idCheck-JuminNum">JuminNum</label>
+        <input id="js-idCheck-JuminNum" value="">
+        <label for="js-idCheck-Name">Name</label>
+        <input id="js-idCheck-Name" value="">
+        <label for="js-idCheck-IssDt">IssDt</label>
+        <input id="js-idCheck-IssDt" value="">
+        <label for="js-idCheck-lcnsNo">lcnsNo</label>
+        <input id="js-idCheck-lcnsNo" value="">
+        <br><br><br>
+        <label for="js-idCheck-ImgCropInfo">ImgCropInfo</label>
+        <textarea id="js-idCheck-ImgCropInfo" style="width: 1000px;"> </textarea>
+        <br>
+        <label for="js-idCheck-FingerCropInfo">FingerCropInfo</label>
+        <textarea id="js-idCheck-FingerCropInfo" style="width: 1000px;"> </textarea>
+        <br>
+        <label for="js-idCheck-LiveFingerInfo">LiveFingerInfo</label>
+        <textarea id="js-idCheck-LiveFingerInfo" style="width: 1000px;"> </textarea>
+        <br><br><br>
+        <label for="js-idCheck-Return_Val">Return_Val</label>
+        <input id="js-idCheck-Return_Val" value="">
+        <label for="js-idCheck-ErrMsg">ErrMsg</label>
+        <input id="js-idCheck-ErrMsg" value="">
+        <br>
+        <br>
+    </div>
+    <hr>
+    <div class="idCheck" style="background-color: lightgray;">
+        <h2>라이브스캔 테스트</h2>
+
+        <h3>Request</h3>
+        <h4 style="color: red;">준비중</h4>
+        <br><br>
+        <button style="width:150px;height:30px;background-color: rgb(100, 228, 100);" disabled>라이브스캔 실행</button>
+        <button style="width:150px;height:30px;background-color: rgb(100, 228, 100);" disabled>라이브스캔 실행(jsonp)</button>
+        <button style="width:150px;height:30px;background-color: rgb(243, 115, 115);" disabled>라이브스캔 종료</button>
+        <br>
+        <h3>Response</h3>
+
+        <br>
+        <br>
+    </div>
+
+    <div class="signiture" style="background-color: antiquewhite;">
+        <h2>서명패드 테스트</h2>
+
+        <h3>Request</h3>
+        <label for="js-signiture-SystemDate">SystemDate</label>
+        <input id="js-signiture-SystemDate" value="2020-05-22">
+        <label for="js-signiture-JuminNum">JuminNum</label>
+        <input id="js-signiture-JuminNum" value="999999-9999999">
+
+        <br><br>
+        <button style="width:150px;height:30px;background-color: rgb(100, 228, 100);" onclick=ExcuteSigniture(false)>서명패드 실행</button>
+        <button style="width:150px;height:30px;background-color: rgb(100, 228, 100);" onclick=ExcuteSigniture(true)>서명패드 실행 (jsonp)</button>
+        <button style="width:150px;height:30px;background-color: rgb(243, 115, 115);" onclick=CloseSigniture()>서명패드 종료</button>
+        <br>
+        <h3>Response</h3>
+
+        <label for="js-signiture-Result">RESUTL : </label>
+        <textarea id="js-signiture-Result" style="width:1500px"></textarea>
+        <br>
+        <br>
+        <label for="js-signiture-SignitrueBase64">SignitrueBase64 : </label>
+        <textarea id="js-signiture-SignitrueBase64" style="width:1000px"></textarea>
+        <br><br>
+        <label for="js-signiture-Return_Val">Return_Val</label>
+        <input id="js-signiture-Return_Val" value="">
+        <label for="js-signiture-ErrMsg">ErrMsg</label>
+        <input id="js-signiture-ErrMsg" value="">
+    </div>
+
+    <div class="json_test" style="background-color:cadetblue">
+        <button style="margin: 30px;" onclick=JSONPTEST()>JSONPTEST (TESTScan)</button>
+    </div>
+
+
+    <div id="jsImage">
+        <br>
+</body>
+
+</html>

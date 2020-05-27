@@ -1,6 +1,0 @@
-D:\행정안전부_신분증차세대\개발\HYWebServer\Build\Debug\HYWebServer.exe.config
-D:\행정안전부_신분증차세대\개발\HYWebServer\HYWebServer\obj\Debug\Interop.NetFwTypeLib.dll
-D:\행정안전부_신분증차세대\개발\HYWebServer\HYWebServer\obj\Debug\HYWebServer.csproj.ResolveComReference.cache
-D:\제작\HYWebServer\Build\Debug\HYWebServer.exe.config
-D:\제작\HYWebServer\HYWebServer\obj\Debug\Interop.NetFwTypeLib.dll
-D:\제작\HYWebServer\HYWebServer\obj\Debug\HYWebServer.csproj.ResolveComReference.cache
