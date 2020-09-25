@@ -37,7 +37,8 @@ namespace HY_AjaxAgent.LOGIC
             if (string.IsNullOrEmpty(cleaned_data) && !string.IsNullOrEmpty(callback))
             {
                 //jsonp
-                if (callback == "jsonCallback")
+                //2020-09-25 jsonp server check 추가.
+                if (callback == "jsonCallback" || callback == "successServerCheckCallback")
                     cleaned_data = request.QueryString[1];
 
                 if (string.IsNullOrEmpty(cleaned_data) && string.IsNullOrEmpty(callback) && request.QueryString.Count > 1)
@@ -90,6 +91,10 @@ namespace HY_AjaxAgent.LOGIC
                         Send(new AJAX_Response(new Response_Error(exeKind.ToString(), "500", errorMsg)), token);
                     else
                         Send(new AJAX_Response(new Response(exeKind.ToString(), command, "success")), token);
+                    break;
+                //2020-09-25 jsonp server check 추가.
+                case "server_check":
+                    Send(new AJAX_Response(new Response(exeKind.ToString(), command, "success")), token);
                     break;
             }
         }

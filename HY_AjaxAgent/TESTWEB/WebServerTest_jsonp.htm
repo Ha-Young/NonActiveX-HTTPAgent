@@ -1,0 +1,925 @@
+﻿<!doctype html>
+<html>
+
+<head>
+    <meta charset="EUC-KR">
+</head>
+<script type="text/javascript" src="jquery-1.11.2.min.js"></script>
+<script type="text/javascript" src="HY_InziJS.js"></script>
+
+<script language="javascript">
+    function sendDataToServer() {
+        var param = document.getElementById("jsParam").value;
+
+        alert("전달 되는 데이터 :" + param);
+
+        InziEXE_GetReturn(param, function (result) {
+            var RESULT = testScanInterface_Response.RESULT;
+            if (RESULT.errorStatus && RESULT.errorStatus == 0) {
+                InziEXE_Init();
+            }
+        });
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////     Mois SCAN      //////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    function ExcuteMoisScan(isJsonp) {
+        var systemDate = document.getElementById("js-scan-SystemDate").value;
+        var inputDate = document.getElementById("js-scan-InputDate").value;
+        var name = document.getElementById("js-scan-Name").value;
+        var juminNum = document.getElementById("js-scan-JuminNum").value;
+        var scanKind = parseInt(document.getElementById("js-scan-ScanKind").value);
+        var isNative = parseInt(document.getElementById("js-scan-IsNative").value);
+        var isPopupMsg = parseInt(document.getElementById("js-scan-IsPopupMsg").value);
+
+        var mainJimonImg_DPI = parseInt(document.getElementById("js-scan-MainJimonImg_DPI").value);
+        var jimon_500DPI_Img_Extension = parseInt(document.getElementById("js-scan-Jimon_500DPI_Img_Extension").value);
+
+        var resultInput = document.getElementById("js-scan-Result");
+
+        var paramData = {
+            SystemDate: systemDate,
+            InputDate: inputDate,
+            Name: name,
+            JuminNum: juminNum,
+            IsNative: isNative,
+            ScanKind: scanKind,
+            IsPopupMsg: isPopupMsg,
+            MainJimonImg_DPI: mainJimonImg_DPI,
+            Jimon_500DPI_Img_Extension: jimon_500DPI_Img_Extension
+        }
+
+        var MoisScanInterface_Request = {
+            EXEKIND: 1,
+            COMMAND: "start",
+            PARAM: paramData
+        }
+
+        var requestData = JSON.stringify(MoisScanInterface_Request);
+
+        alert("MoisScan 실행 명령.\n전달 되는 데이터 : " + requestData);
+
+        if (isJsonp) {
+            InziEXE_GetReturn_jsonp(requestData, function (result) {
+                alert("전달 받은 데이터 \n: " + result);
+                resultInput.value = result;
+
+                var MoisScanInterface_Response = JSON.parse(result);
+                var RESULT = MoisScanInterface_Response.RESULT;
+                console.log(MoisScanInterface_Response);
+
+                set_SCAN_HTML(RESULT);
+            });
+        } else {
+            InziEXE_GetReturn(requestData, function (result) {
+                alert("전달 받은 데이터 \n: " + result);
+                resultInput.value = result;
+
+                var MoisScanInterface_Response = JSON.parse(result);
+                var RESULT = MoisScanInterface_Response.RESULT;
+                console.log(MoisScanInterface_Response);
+
+                set_SCAN_HTML(RESULT);
+            });
+        }
+    }
+
+    function CloseMoisScan() {
+        var resultInput = document.getElementById("js-scan-Result");
+
+        var MoisScanInterface_Request = {
+            EXEKIND: 1,
+            COMMAND: "close",
+            PARAM: null
+        }
+
+        var requestData = JSON.stringify(MoisScanInterface_Request);
+
+        InziEXE_GetReturn(requestData, function (result) {
+            resultInput.value = result;
+            var MoisScanInterface_Response = JSON.parse(result);
+            var RESULT = MoisScanInterface_Response.RESULT;
+            if (RESULT.ErrorStatus) {
+                alert("error 발생. " + RESULT.ErrorMsg);
+            } else {
+                alert("종료성공");
+            }
+        });
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////     Mois IDCheck     //////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    function ExcuteIDCheck(isJsonp) {
+        var idKind = document.getElementById("js-idCheck-IDKind").value;
+        var isNative = document.getElementById("js-idCheck-IsNative").value;
+
+        var resultInput = document.getElementById("js-idCheck-Result");
+
+        var paramData = {
+            IDKind: idKind,
+            IsNative: isNative
+        }
+
+        var IDCheckInterface_Request = {
+            EXEKIND: 2,
+            COMMAND: "start",
+            PARAM: paramData
+        }
+
+        var requestData = JSON.stringify(IDCheckInterface_Request);
+
+        alert("IDCheck 실행 명령.\n전달 되는 데이터 : " + requestData);
+
+        if (isJsonp) {
+            InziEXE_GetReturn_jsonp(requestData, function (result) {
+                alert("전달 받은 데이터 \n: " + result);
+                resultInput.value = result;
+
+                var IDCheckInterface_Response = JSON.parse(result);
+                var RESULT = IDCheckInterface_Response.RESULT;
+                console.log(IDCheckInterface_Response);
+
+                set_IDCHECK_HTML(RESULT);
+            });
+        } else {
+            InziEXE_GetReturn(requestData, function (result) {
+                alert("전달 받은 데이터 \n: " + result);
+                resultInput.value = result;
+
+                var IDCheckInterface_Response = JSON.parse(result);
+                var RESULT = IDCheckInterface_Response.RESULT;
+                console.log(IDCheckInterface_Response);
+
+                set_IDCHECK_HTML(RESULT);
+            });
+        }
+
+    }
+
+    function CloseIDCheck() {
+        var resultInput = document.getElementById("js-idCheck-Result");
+
+        var IDCheckInterface_Request = {
+            EXEKIND: 2,
+            COMMAND: "close",
+            PARAM: null
+        }
+
+        var requestData = JSON.stringify(IDCheckInterface_Request);
+
+        InziEXE_GetReturn(requestData, function (result) {
+            resultInput.value = result;
+            var IDCheckInterface_Response = JSON.parse(result);
+            var RESULT = IDCheckInterface_Response.RESULT;
+            if (RESULT.ErrorStatus) {
+                alert("error 발생. " + RESULT.ErrorMsg);
+            } else {
+                alert("종료성공");
+            }
+        });
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////     Mois Fingers     //////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    function ExcuteFingers(isJsonp) {
+
+        var fingerKind = document.getElementById("js-Fingers-FingerKind").value;
+        var komsco_IMG = document.getElementById("js-Fingers-KOMSCO_IMG").value;
+        var komsco_IMG_MainDPI = document.getElementById("js-Fingers-KOMSCO_IMG_MainDPI").value;
+        var komsco_IMG_500DPI_Extension = document.getElementById("js-Fingers-KOMSCO_IMG_500DPI_Extension").value;
+
+        var resultInput = document.getElementById("js-Fingers-Result");
+
+        var paramData = {
+            FingerKind: fingerKind,
+            KOMSCO_IMG: komsco_IMG,
+            KOMSCO_IMG_MainDPI: komsco_IMG_MainDPI,
+            KOMSCO_IMG_500DPI_Extension: komsco_IMG_500DPI_Extension
+        }
+
+        var FingersInterface_Request = {
+            EXEKIND: 3,
+            COMMAND: "start",
+            PARAM: paramData
+        }
+
+        var requestData = JSON.stringify(FingersInterface_Request);
+
+        alert("Fingers 실행 명령.\n전달 되는 데이터 : " + requestData);
+
+        if (isJsonp) {
+            InziEXE_GetReturn_jsonp(requestData, function (result) {
+                alert("전달 받은 데이터 \n: " + result);
+                resultInput.value = result;
+
+                var FingersInterface_Response = JSON.parse(result);
+                var RESULT = FingersInterface_Response.RESULT;
+                console.log(FingersInterface_Response);
+
+                set_FINGERS_HTML(RESULT);
+            });
+        } else {
+            InziEXE_GetReturn(requestData, function (result) {
+                alert("전달 받은 데이터 \n: " + result);
+                resultInput.value = result;
+
+                var FingersInterface_Response = JSON.parse(result);
+                var RESULT = FingersInterface_Response.RESULT;
+                console.log(FingersInterface_Response);
+
+                set_FINGERS_HTML(RESULT);
+            });
+        }
+
+    }
+
+    function CloseFingers() {
+
+        var resultInput = document.getElementById("js-Fingers-Result");
+
+        var FingersInterface_Request = {
+            EXEKIND: 3,
+            COMMAND: "close",
+            PARAM: null
+        }
+
+        var requestData = JSON.stringify(FingersInterface_Request);
+
+        InziEXE_GetReturn(requestData, function (result) {
+            resultInput.value = result;
+            var FingersInterface_Response = JSON.parse(result);
+            var RESULT = FingersInterface_Response.RESULT;
+            if (RESULT.ErrorStatus) {
+                alert("error 발생. " + RESULT.ErrorMsg);
+            } else {
+                alert("종료성공");
+            }
+        });
+    }
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////     Mois Signiture      //////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    function ExcuteSigniture(isJsonp) {
+        var systemDate = document.getElementById("js-signiture-SystemDate").value;
+
+        var resultInput = document.getElementById("js-signiture-Result");
+
+
+        var paramData = {
+            SystemDate: systemDate
+        }
+        //TestScan : 0
+        // SCAN : 1
+        // IDCheck : 2
+        // LiveFinger : 3
+        // Signiture : 4
+        var signiture_Interface_Request = {
+            EXEKIND: 4,
+            COMMAND: "start",
+            PARAM: paramData
+        }
+
+        var requestData = JSON.stringify(signiture_Interface_Request);
+
+        //alert("Signiture(서명) 실행 명령.\n전달 되는 데이터 : " + requestData);
+
+        if (isJsonp) {
+            InziEXE_GetReturn_jsonp(requestData, function (result) {
+                alert("전달 받은 데이터 \n: " + result);
+                resultInput.value = result;
+
+                var signiture_Interface_Response = JSON.parse(result);
+                var RESULT = signiture_Interface_Response.RESULT;
+                console.log(signiture_Interface_Response);
+                set_SIGNITURE_HTML(RESULT);
+            });
+        } else {
+            InziEXE_GetReturn(requestData, function (result) {
+                alert("전달 받은 데이터 \n: " + result);
+                resultInput.value = result;
+
+                var signiture_Interface_Response = JSON.parse(result);
+                var RESULT = signiture_Interface_Response.RESULT;
+                console.log(signiture_Interface_Response);
+                set_SIGNITURE_HTML(RESULT);
+            });
+        }
+
+    }
+
+    function CloseSigniture() {
+        var resultInput = document.getElementById("js-signiture-Result");
+
+
+        var signiture_Interface_Request = {
+            EXEKIND: 4,
+            COMMAND: "close",
+            PARAM: null
+        }
+
+        var requestData = JSON.stringify(signiture_Interface_Request);
+
+        InziEXE_GetReturn(requestData, function (result) {
+            resultInput.value = result;
+            var signiture_Interface_Response = JSON.parse(result);
+            var RESULT = signiture_Interface_Response.RESULT;
+            if (RESULT.ErrorStatus) {
+                alert("error 발생. " + RESULT.ErrorMsg);
+            } else {
+                alert("종료성공");
+            }
+        });
+    }
+
+
+    function InterfaceExample() {
+        // EXE에 전달 할 데이터(Param) -> 각 EXE마다 정의 필요. 
+        // TEST 프로그램은 다음과 같이 구성
+        var paramData = {
+            SystemDate: new Date(),
+            InputDate: new Date(),
+            User: "홍길동",
+            Jumin: "123456-1234567"
+        }
+
+        // AJAX Request로 전달 될 Interface 객체
+        var Interface_Request = {
+            EXEKIND: 0, // 사용할 EXE 종류 (0 : TEST, 1 : 화상스캔, 2 : 신분증 진위확인, 3 : 서명, 4 : 십지지문)
+            COMMAND: "start", // 명령어 (start : 실행 ... 추후 구현 가능)
+            PARAM: paramData // 명령어에 대한 파라미터 
+        }
+
+        // Local Web Server에 위 Interface 데이터를 전달 하기 위해서는 JSON String형태로 보내야 됨.
+        var requestData = JSON.stringify(Interface_Request);
+
+        // requestData 전달 및 callback 함수를 통해 결과값 받기. (jsonp)
+        InziEXE_GetReturn_jsonp(requestData, function (result) {
+            // 결과값으로 전달받을 Interface 데이터 또한 각 EXE마다 정의가 필요하며,
+            // JsonString 형태로 전달됨.
+            var result = JSON.parse(result);
+            var Interface_Response = result.RESULT; // 전달된 JSON의 RESULT값이 결과값으로 정해야 될 Interface
+
+            // 각 Interface에 정의된 키 값으로 결과 값을 얻을 수 있음.
+            // TEST 프로그램은 다음과 같이 구성
+            var scanDate = Interface_Response.ScanDate;
+            var cropFilePath = Interface_Response.CropFilePath;
+
+            // To Do Next...
+        });
+    }
+
+    function setEXETimeoutSample() {
+        var timeOutValue = 1000 * 60 * 60; // 1시간
+        SetEXETimeout(timeOutValue);
+    }
+
+    function JSONPTEST() {
+        var paramData = {
+            SystemDate: "systemDate",
+            InputDate: "inputDate",
+            User: "user",
+            Jumin: "123-123"
+        }
+
+        var testScanInterface_Request = {
+            EXEKIND: 0,
+            COMMAND: "start",
+            PARAM: paramData
+        }
+
+        var requestData = JSON.stringify(testScanInterface_Request);
+
+        alert("TESTScan 실행 명령.\n전달 되는 데이터 : " + requestData);
+
+        InziEXE_GetReturn_jsonp(requestData, function (result) {
+            alert("전달 받은 데이터 \n: " + result);
+            //resultInput.value = result;
+
+            var testScanInterface_Response = JSON.parse(result);
+            var RESULT = testScanInterface_Response.RESULT;
+            console.log(testScanInterface_Response);
+        });
+    }
+
+    //////////////////////////////////////////////////////////////////
+    ////////////////////////private////////////////////////////////////
+    function imageViewBase64(imageTag, imageBase64, extension) {
+        var imgBase64 = "data:image/" + extension + ";base64, " + imageBase64;
+        imageTag.src = imgBase64;
+        imageTag.alt = "Base64Image";
+        imageTag.style = "width:200px;height:200px;";
+    }
+
+    function set_SCAN_HTML(RESULT) {
+
+        var Return_Val = document.getElementById("js-scan-Return_Val");
+        var ErrMsg = document.getElementById("js-scan-ErrMsg");
+
+        Return_Val.value = RESULT.Return_Val;
+        ErrMsg.value = RESULT.ErrMsg;
+
+        var ScanDate = document.getElementById("js-scan-ScanDate");
+        ScanDate.value = RESULT.ScanDate;
+
+        var ImageBase64_View = document.getElementById("js-scan-ImageBase64_View");
+        var ImageBase64_View_Extension = document.getElementById("js-scan-ImageBase64_View_Extension");
+        imageViewBase64(ImageBase64_View, RESULT.ImageBase64_View, RESULT.ImageBase64_View_Extension);
+        ImageBase64_View_Extension.value = RESULT.ImageBase64_View_Extension;
+
+
+        var ImageBase64_Standard = document.getElementById("js-scan-ImageBase64_Standard");
+        var ImageBase64_Standard_Extension = document.getElementById("js-scan-ImageBase64_Standard_Extension");
+        var Standard_ImageInfo_FileSize = document.getElementById("js-scan-Standard_ImageInfo_FileSize");
+        var Standard_ImageInfo_DPI = document.getElementById("js-scan-Standard_ImageInfo_DPI");
+
+        ImageBase64_Standard.value = RESULT.ImageBase64_Standard;
+        ImageBase64_Standard_Extension.value = RESULT.ImageBase64_Standard_Extension;
+        Standard_ImageInfo_FileSize.value = RESULT.Standard_ImageInfo_FileSize;
+        Standard_ImageInfo_DPI.value = RESULT.Standard_ImageInfo_DPI;
+
+        var ImageBase64_Second = document.getElementById("js-scan-ImageBase64_Second");
+        var ImageBase64_Second_Extension = document.getElementById("js-scan-ImageBase64_Second_Extension");
+        var Second_ImageInfo_FileSize = document.getElementById("js-scan-Second_ImageInfo_FileSize");
+        var Second_ImageInfo_DPI = document.getElementById("js-scan-Second_ImageInfo_DPI");
+
+        ImageBase64_Second.value = RESULT.ImageBase64_Second;
+        ImageBase64_Second_Extension.value = RESULT.ImageBase64_Second_Extension;
+        Second_ImageInfo_FileSize.value = RESULT.Second_ImageInfo_FileSize;
+        Second_ImageInfo_DPI.value = RESULT.Second_ImageInfo_DPI;
+
+    }
+
+    function set_IDCHECK_HTML(RESULT) {
+
+        var Return_Val = document.getElementById("js-idCheck-Return_Val");
+        var ErrMsg = document.getElementById("js-idCheck-ErrMsg");
+
+        Return_Val.value = RESULT.Return_Val;
+        ErrMsg.value = RESULT.ErrMsg;
+
+        var IDKind = document.getElementById("js-idCheck-IDKind2");
+        var JuminNum = document.getElementById("js-idCheck-JuminNum")
+        var Name = document.getElementById("js-idCheck-Name");
+        var IssDt = document.getElementById("js-idCheck-IssDt");
+        var lcnsNo = document.getElementById("js-idCheck-lcnsNo");
+
+        var Nation = document.getElementById("js-idCheck-Nation");
+        var StayNum = document.getElementById("js-idCheck-StayNum");
+
+
+        if (RESULT.IDKind == 0) {
+            IDKind.value = "";
+            JuminNum.value = "";
+            Name.value = "";
+            IssDt.value = "";
+            lcnsNo.value = "";
+            Nation.value = "";
+            StayNum.value = "";
+
+        } else {
+            IDKind.value = RESULT.IDKind;
+            JuminNum.value = RESULT.JuminNum;
+            Name.value = RESULT.Name;
+            IssDt.value = RESULT.IssDt;
+            if (RESULT.IDKind == 2)
+                lcnsNo.value = RESULT.lcnsNo;
+            else
+                lcnsNo.value = "";
+
+            if (RESULT.IDKind == 3 || RESULT.IDKind == 5) {
+                Nation.value = RESULT.Nation;
+                StayNum.value = RESULT.StayNum;
+            } else {
+                Nation.value = "";
+                StayNum.value = "";
+            }
+        }
+
+
+        var ImgCropBase64 = document.getElementById("js-idCheck-ImgCropBase64");
+        var ImgCropExtractBase64 = document.getElementById("js-idCheck-ImgCropExtractBase64");
+        ImgCropBase64.src = "";
+        ImgCropExtractBase64.value = "";
+        if (RESULT.IDKind != 0) {
+            imageViewBase64(ImgCropBase64, RESULT.ImgCropBase64, "BMP");
+            ImgCropExtractBase64.value = RESULT.ImgCropExtractBase64;
+        }
+
+        var FingerCropBase64 = document.getElementById("js-idCheck-FingerCropBase64");
+        var FingerCropExtractBase64 = document.getElementById("js-idCheck-FingerCropExtractBase64");
+        FingerCropBase64.src = "";
+        FingerCropExtractBase64.value = "";
+        if (RESULT.IDKind == 1) {
+            imageViewBase64(FingerCropBase64, RESULT.FingerCropBase64, "BMP");
+            FingerCropExtractBase64.value = RESULT.FingerCropExtractBase64;
+        }
+
+        var FingerBase64 = document.getElementById("js-idCheck-FingerBase64");
+        var FingerExtractBase64 = document.getElementById("js-idCheck-FingerExtractBase64");
+        var FingerBMPBase64 = document.getElementById("js-idCheck-FingerBMPBase64");
+        FingerBMPBase64.src = "";
+        FingerExtractBase64.value = "";
+        FingerBase64.value = "";
+        if (RESULT.IDKind == 0) {
+            imageViewBase64(FingerBMPBase64, RESULT.FingerBMPBase64, "BMP");
+            FingerExtractBase64.value = RESULT.FingerExtractBase64;
+            FingerBase64.value = RESULT.FingerBase64;
+        }
+
+    }
+
+    function set_FINGERS_HTML(RESULT) {
+        var Return_Val = document.getElementById("js-Fingers-Return_Val");
+        var ErrMsg = document.getElementById("js-Fingers-ErrMsg");
+
+        Return_Val.value = RESULT.Return_Val;
+        ErrMsg.value = RESULT.ErrMsg;
+
+        var vFingerImage_1_WSQ_BASE64 = document.getElementById("js-Fingers-FingerImage_1_WSQ_BASE64");
+        var vFingerImage_1_BMP_BASE64 = document.getElementById("js-Fingers-FingerImage_1_BMP_BASE64");
+
+        vFingerImage_1_WSQ_BASE64.value = "";
+        vFingerImage_1_BMP_BASE64.src = "";
+        if (RESULT.FingerImage_1_WSQ_BASE64 != "") {
+            vFingerImage_1_WSQ_BASE64.value = RESULT.FingerImage_1_WSQ_BASE64;
+            imageViewBase64(vFingerImage_1_BMP_BASE64, RESULT.FingerImage_1_BMP_BASE64, "BMP");
+        }
+
+        var vFingerImage_2_WSQ_BASE64 = document.getElementById("js-Fingers-FingerImage_2_WSQ_BASE64");
+        var vFingerImage_2_BMP_BASE64 = document.getElementById("js-Fingers-FingerImage_2_BMP_BASE64");
+
+        vFingerImage_2_WSQ_BASE64.value = "";
+        vFingerImage_2_BMP_BASE64.src = "";
+        if (RESULT.FingerImage_2_WSQ_BASE64 != "") {
+            vFingerImage_2_WSQ_BASE64.value = RESULT.FingerImage_2_WSQ_BASE64;
+            imageViewBase64(vFingerImage_2_BMP_BASE64, RESULT.FingerImage_2_BMP_BASE64, "BMP");
+        }
+
+        var vKOMSCO_Img_BMP_Base64 = document.getElementById("js-Fingers-KOMSCO_Img_BMP_Base64");
+
+        vKOMSCO_Img_BMP_Base64.src = "";
+        imageViewBase64(vKOMSCO_Img_BMP_Base64, RESULT.KOMSCO_Img_BMP_Base64, "BMP");
+
+        var vKOMSCO_Main_Img_Base64 = document.getElementById("js-Fingers-KOMSCO_Main_Img_Base64");
+        var vKOMSCO_Main_Img_Extension = document.getElementById("js-Fingers-KOMSCO_Main_Img_Extension");
+        var vKOMSCO_Main_Img_FileSize = document.getElementById("js-Fingers-KOMSCO_Main_Img_FileSize");
+        var vKOMSCO_Main_Img_DPI = document.getElementById("js-Fingers-KOMSCO_Main_Img_DPI");
+
+        vKOMSCO_Main_Img_Base64.value = "";
+        vKOMSCO_Main_Img_Extension.value = "";
+        vKOMSCO_Main_Img_FileSize.value = "";
+        vKOMSCO_Main_Img_DPI.value = "";
+
+        if (RESULT.KOMSCO_Main_Img_Base64 != "") {
+            vKOMSCO_Main_Img_Base64.value = RESULT.KOMSCO_Main_Img_Base64;
+            vKOMSCO_Main_Img_Extension.value = RESULT.KOMSCO_Main_Img_Extension;
+            vKOMSCO_Main_Img_FileSize.value = RESULT.KOMSCO_Main_Img_FileSize;
+            vKOMSCO_Main_Img_DPI.value = RESULT.KOMSCO_Main_Img_DPI;
+        }
+
+        var vKOMSCO_Second_Img_Base64 = document.getElementById("js-Fingers-KOMSCO_Second_Img_Base64");
+        var vKOMSCO_Second_Img_Extension = document.getElementById("js-Fingers-KOMSCO_Second_Img_Extension");
+        var vKOMSCO_Second_Img_FileSize = document.getElementById("js-Fingers-KOMSCO_Second_Img_FileSize");
+        var vKOMSCO_Second_Img_DPI = document.getElementById("js-Fingers-KOMSCO_Second_Img_DPI");
+
+        vKOMSCO_Second_Img_Base64.value = "";
+        vKOMSCO_Second_Img_Extension.value = "";
+        vKOMSCO_Second_Img_FileSize.value = "";
+        vKOMSCO_Second_Img_DPI.value = "";
+
+        if (RESULT.KOMSCO_Second_Img_Base64 != "") {
+            vKOMSCO_Second_Img_Base64.value = RESULT.KOMSCO_Second_Img_Base64;
+            vKOMSCO_Second_Img_Extension.value = RESULT.KOMSCO_Second_Img_Extension;
+            vKOMSCO_Second_Img_FileSize.value = RESULT.KOMSCO_Second_Img_FileSize;
+            vKOMSCO_Second_Img_DPI.value = RESULT.KOMSCO_Second_Img_DPI;
+        }
+
+        var vScanner_Ver = document.getElementById("js-Fingers-Scanner_Ver");
+        vScanner_Ver.value = RESULT.Scanner_Ver;
+
+    }
+
+    function set_SIGNITURE_HTML(RESULT) {
+
+        var Return_Val = document.getElementById("js-signiture-Return_Val");
+        var ErrMsg = document.getElementById("js-signiture-ErrMsg");
+
+        Return_Val.value = RESULT.Return_Val;
+        ErrMsg.value = RESULT.ErrMsg;
+
+
+        var SignImage_Base64 = document.getElementById("js-signiture-SignImage_Base64");
+        var SignBMP_Base64 = document.getElementById("js-signiture-SignBMP_Base64");
+        var SignBMPImg = document.getElementById("js-signiture-SignBMPImg");
+
+        SignImage_Base64.value = RESULT.SignImage_Base64;
+        SignBMP_Base64.value = RESULT.SignBMP_Base64;
+        imageViewBase64(SignBMPImg, RESULT.SignBMP_Base64, "bmp");
+
+
+    }
+</script>
+
+<body style="background-color: azure;">
+    <script>
+        document.characterSet = "EUC-KR";
+        document.write("<p>document.characterSet : " + document.characterSet + "</p>");
+    </script>
+    <div style="background-color: cadetblue; padding: 20px;">
+        <span style="color: black; font-weight: 600; font-size: 20px;">InziAgent 실행 -></span>
+        <button onclick=InziEXE_Init()
+            style="width:200px; height:50px; background-color: brown; color: white; font-size: 20px; margin-bottom: 20px;">INZI_MoisAgent
+            Init</button>
+
+    </div>
+    <br>
+
+    <div class="scan" style="background-color: lightgray;">
+        <h2>화상 입력기 테스트</h2>
+        <h3>Request</h3>
+        <label for="js-scan-SystemDate">SystemDate</label>
+        <input id="js-scan-SystemDate" value="2020-05-22">
+        <label for="js-scan-InputDate">InputDate</label>
+        <input id="js-scan-InputDate" value="2020-05-22">
+        <label for="js-scan-Name">Name</label>
+        <input id="js-scan-Name" value="홍길동">
+        <label for="js-scan-JuminNum">JuminNum</label>
+        <input id="js-scan-JuminNum" value="999999-9999999">
+        <label for="js-scan-IsNative">IsNative</label>
+        <input id="js-scan-IsNative" value="0" style="width: 50px;">
+        <br>
+        <label for="js-scan-ScanKind">ScanKind</label>
+        <input id="js-scan-ScanKind" value="1" style="width: 50px;">
+        <label for="js-scan-IsPopupMsg">IsPopupMsg</label>
+        <input id="js-scan-IsPopupMsg" value="0" style="width: 50px;">
+
+        <label for="js-scan-MainJimonImg_DPI">MainJimonImg_DPI</label>
+        <input id="js-scan-MainJimonImg_DPI" value="1" style="width: 50px;">
+        <label for="js-scan-Jimon_500DPI_Img_Extension">Jimon_500DPI_Img_Extension</label>
+        <input id="js-scan-Jimon_500DPI_Img_Extension" value="1" style="width: 50px;">
+        <br><br>
+        <button style="width:150px;height:30px;background-color: rgb(100, 228, 100);" onclick=ExcuteMoisScan(true)>화상입력기
+            실행</button>
+        <!--
+        <button style="width:150px;height:30px;background-color: rgb(100, 228, 100);" onclick=ExcuteMoisScan(true)>화상 입력기 실행 (jsonp)</button>
+        <button style="width:150px;height:30px;background-color: rgb(243, 115, 115);" onclick=CloseMoisScan()>화상 입력기 종료</button>
+        -->
+        <br>
+        <h3>Response</h3>
+        <label for="js-scan-Result">RESUTL : </label>
+        <textarea id="js-scan-Result" style="width:1500px"></textarea>
+        <br>
+        <br>
+        <label for="js-scan-Return_Val">Return_Val</label>
+        <input id="js-scan-Return_Val" value="">
+        <label for="js-scan-ErrMsg">ErrMsg</label>
+        <input id="js-scan-ErrMsg" value="">
+        <br>
+        <br>
+        <label for="js-scan-ScanDate">ScanDate</label>
+        <input id="js-scan-ScanDate" value="">
+        <br>
+        <br>
+        <label for="js-scan-ImageBase64_Standard">ImageBase64_Standard</label>
+        <textarea id="js-scan-ImageBase64_Standard" style="width:1000px"></textarea>
+        <br>
+        <label for="js-scan-Standard_ImageInfo_FileSize">Standard_ImageInfo_FileSize</label>
+        <input id="js-scan-Standard_ImageInfo_FileSize" style="width: 50px;" value="">
+        <label for="js-scan-Standard_ImageInfo_DPI">Standard_ImageInfo_DPI</label>
+        <input id="js-scan-Standard_ImageInfo_DPI" style="width: 50px;" value="">
+        <label for="js-scan-ImageBase64_Standard_Extension">ImageBase64_Standard_Extension</label>
+        <input id="js-scan-ImageBase64_Standard_Extension" style="width: 50px;" value="">
+        <br>
+        <br>
+        <label for="js-scan-ImageBase64_Second">ImageBase64_Second</label>
+        <textarea id="js-scan-ImageBase64_Second" style="width:1000px"></textarea>
+        <br>
+        <label for="js-scan-Second_ImageInfo_FileSize">Second_ImageInfo_FileSize</label>
+        <input id="js-scan-Second_ImageInfo_FileSize" style="width: 50px;" value="">
+        <label for="js-scan-Second_ImageInfo_DPI">Second_ImageInfo_DPI</label>
+        <input id="js-scan-Second_ImageInfo_DPI" style="width: 50px;" value="">
+        <label for="js-scan-ImageBase64_Second_Extension">ImageBase64_Second_Extension</label>
+        <input id="js-scan-ImageBase64_Second_Extension" style="width: 50px;" value="">
+        <br>
+        <br>
+        <label for="js-scan-ImageBase64_View">ImageBase64_View</label>
+        <img id="js-scan-ImageBase64_View" style="width:200px;height:200px;"></img>
+        <label for="js-scan-ImageBase64_View_Extension">ImageBase64_View_Extension</label>
+        <input id="js-scan-ImageBase64_View_Extension" style="width: 50px;" value="">
+        <br>
+    </div>
+    <hr>
+    <div class="idCheck" style="background-color: antiquewhite;">
+        <h2>본인확인 테스트</h2>
+        <h3>Request</h3>
+        <label for="js-idCheck-IDKind">IDKind</label>
+        <input id="js-idCheck-IDKind" value="0" style="width: 50px;">
+        <label for="js-idCheck-IsNative">IsNative</label>
+        <input id="js-idCheck-IsNative" value="0" style="width: 50px;">
+        <br><br>
+        <button style="width:150px;height:30px;background-color: rgb(100, 228, 100);" onclick=ExcuteIDCheck(true)>본인확인
+            실행</button>
+        <!--
+        <button style="width:150px;height:30px;background-color: rgb(100, 228, 100);" onclick=ExcuteIDCheck(true)>본인확인 실행 (jsonp)</button>
+        <button style="width:150px;height:30px;background-color: rgb(243, 115, 115);" onclick=CloseIDCheck()>본인확인 종료</button>
+        -->
+        <br>
+        <h3>Response</h3>
+        <label for="js-idCheck-Result">RESUTL : </label>
+        <textarea id="js-idCheck-Result" style="width:1500px"></textarea>
+        <br>
+        <br>
+        <label for="js-idCheck-Return_Val">Return_Val</label>
+        <input id="js-idCheck-Return_Val" value="">
+        <label for="js-idCheck-ErrMsg">ErrMsg</label>
+        <input id="js-idCheck-ErrMsg" value="">
+        <br>
+        <br>
+        <!--
+        <label for="js-idCheck-ImgExtension">ImgExtension</label>
+        <input id="js-idCheck-ImgExtension" value="">
+        <label for="js-idCheck-FingerExtension">FingerExtension</label>
+        <input id="js-idCheck-FingerExtension" value="">
+        <label for="js-idCheck-LiveFingerExtension">LiveFingerExtension</label>
+        <input id="js-idCheck-LiveFingerExtension" value="">
+        <br>
+        <br><br>
+        -->
+        <label for="js-idCheck-IDKind2">IDKind</label>
+        <input id="js-idCheck-IDKind2" value="">
+        <label for="js-idCheck-JuminNum">JuminNum</label>
+        <input id="js-idCheck-JuminNum" value="">
+        <label for="js-idCheck-Name">Name</label>
+        <input id="js-idCheck-Name" value="">
+        <label for="js-idCheck-IssDt">IssDt</label>
+        <input id="js-idCheck-IssDt" value="">
+        <label for="js-idCheck-lcnsNo">lcnsNo</label>
+        <input id="js-idCheck-lcnsNo" value="">
+        <label for="js-idCheck-Nation">Nation</label>
+        <input id="js-idCheck-Nation" value="">
+        <label for="js-idCheck-StayNum">StayNum</label>
+        <input id="js-idCheck-StayNum" value="">
+
+        <br><br><br>
+        <label for="js-idCheck-ImgCropExtractBase64">ImgCropExtractBase64</label>
+        <textarea id="js-idCheck-ImgCropExtractBase64" style="width: 1000px;"> </textarea>
+        <br><br>
+        <label for="js-idCheck-FingerCropExtractBase64">FingerCropExtractBase64</label>
+        <textarea id="js-idCheck-FingerCropExtractBase64" style="width: 1000px;"> </textarea>
+        <br><br>
+        <label for="js-idCheck-FingerExtractBase64">FingerExtractBase64</label>
+        <textarea id="js-idCheck-FingerExtractBase64" style="width: 1000px;"> </textarea>
+        <br><br><br>
+        <label for="js-idCheck-FingerBase64">FingerBase64</label>
+        <textarea id="js-idCheck-FingerBase64" style="width: 1000px;"> </textarea>
+        <br><br>
+        <label for="js-idCheck-ImgCropBase64">ImgCropBase64</label>
+        <img id="js-idCheck-ImgCropBase64" style="width:200px;height:200px;"></img>
+        <label for="js-idCheck-FingerCropBase64">FingerCropBase64</label>
+        <img id="js-idCheck-FingerCropBase64" style="width:200px;height:200px;"></img>
+        <label for="js-idCheck-FingerBMPBase64">FingerBMPBase64</label>
+        <img id="js-idCheck-FingerBMPBase64" style="width:200px;height:200px;"></img>
+        <br>
+        <br>
+
+    </div>
+    <hr>
+    <div class="Fingers" style="background-color: lightgray;">
+        <h2>라이브스캔 테스트</h2>
+
+        <h3>Request</h3>
+        <label for="js-Fingers-FingerKind">FingerKind - 손가락 번호(종류)</label>
+        <input id="js-Fingers-FingerKind" value="1" style="width: 50px;"> (1~13)
+        <br>
+        <label for="js-Fingers-KOMSCO_IMG">KOMSCO_IMG - 조폐공사 전달 지문 여부</label>
+        <input id="js-Fingers-KOMSCO_IMG" value="0" style="width: 50px;"> (0 : 적용 안 함, 1 : 적용 - FingerKind 값이 1~10 사이에만
+        적용됨)
+        <br>
+        <label for="js-Fingers-KOMSCO_IMG_MainDPI">KOMSCO_IMG_MainDPI 메인 지문 이미지 DPI 설정</label>
+        <input id="js-Fingers-KOMSCO_IMG_MainDPI" value="1" style="width: 50px;"> (1:240, 2:500 dpi)
+        <br>
+        <label for="js-Fingers-KOMSCO_IMG_500DPI_Extension">KOMSCO_IMG_500DPI_Extension 500dpi 지문 이미지 이미지 포멧</label>
+        <input id="js-Fingers-KOMSCO_IMG_500DPI_Extension" value="1" style="width: 50px;"> (1:WSQ, 2:RAW)
+
+        <br><br>
+        <button style="width:150px;height:30px;background-color: rgb(100, 228, 100);" onclick=ExcuteFingers(true)>라이브스캔
+            실행</button>
+        <!--
+        <button style="width:150px;height:30px;background-color: rgb(100, 228, 100);" onclick=ExcuteFingers(true)>라이브스캔 실행 (jsonp)</button>
+        <button style="width:150px;height:30px;background-color: rgb(243, 115, 115);" onclick=CloseFingers()>라이브스캔 종료</button>
+         -->
+        <br>
+        <h3>Response</h3>
+        <label for="js-Fingers-Result">RESUTL : </label>
+        <textarea id="js-Fingers-Result" style="width:1500px"></textarea>
+        <br>
+        <br>
+        <label for="js-Fingers-Return_Val">Return_Val</label>
+        <input id="js-Fingers-Return_Val" value="">
+        <label for="js-Fingers-ErrMsg">ErrMsg</label>
+        <input id="js-Fingers-ErrMsg" value="">
+        <br>
+        <br>
+        <label for="js-Fingers-Scanner_Ver">Scanner_Ver</label>
+        <input id="js-Fingers-Scanner_Ver" value="">
+        <br>
+        <br>
+        <label for="js-Fingers-KOMSCO_Main_Img_Base64">KOMSCO_Main_Img_Base64</label>
+        <textarea id="js-Fingers-KOMSCO_Main_Img_Base64" style="width: 1000px;"> </textarea>
+        <br>
+        <br>
+        <label for="js-Fingers-KOMSCO_Main_Img_FileSize">KOMSCO_Main_Img_FileSize</label>
+        <input id="js-Fingers-KOMSCO_Main_Img_FileSize" value="">
+        <label for="js-Fingers-KOMSCO_Main_Img_Extension">KOMSCO_Main_Img_Extension</label>
+        <input id="js-Fingers-KOMSCO_Main_Img_Extension" value="">
+        <label for="js-Fingers-KOMSCO_Main_Img_DPI">KOMSCO_Main_Img_DPI</label>
+        <input id="js-Fingers-KOMSCO_Main_Img_DPI" value="">
+        <br>
+        <br>
+        <label for="js-Fingers-KOMSCO_Second_Img_Base64">KOMSCO_Second_Img_Base64</label>
+        <textarea id="js-Fingers-KOMSCO_Second_Img_Base64" style="width: 1000px;"> </textarea>
+        <br>
+        <br>
+        <label for="js-Fingers-KOMSCO_Second_Img_FileSize">KOMSCO_Second_Img_FileSize</label>
+        <input id="js-Fingers-KOMSCO_Second_Img_FileSize" value="">
+        <label for="js-Fingers-KOMSCO_Second_Img_Extension">KOMSCO_Second_Img_Extension</label>
+        <input id="js-Fingers-KOMSCO_Second_Img_Extension" value="">
+        <label for="js-Fingers-KOMSCO_Second_Img_DPI">KOMSCO_Second_Img_DPI</label>
+        <input id="js-Fingers-KOMSCO_Second_Img_DPI" value="">
+        <br>
+        <br>
+        <label for="js-Fingers-FingerImage_1_WSQ_BASE64">FingerImage_1_WSQ_BASE64</label>
+        <textarea id="js-Fingers-FingerImage_1_WSQ_BASE64" style="width: 1000px;"> </textarea>
+        <br>
+        <br>
+        <label for="js-Fingers-FingerImage_2_WSQ_BASE64">FingerImage_2_WSQ_BASE64</label>
+        <textarea id="js-Fingers-FingerImage_2_WSQ_BASE64" style="width: 1000px;"> </textarea>
+        <br>
+        <br>
+        <label for="js-Fingers-KOMSCO_Img_BMP_Base64">KOMSCO_Img_BMP_Base64</label>
+        <img id="js-Fingers-KOMSCO_Img_BMP_Base64" style="width:200px;height:200px;"></img>
+
+        <label for="js-Fingers-FingerImage_1_BMP_BASE64">FingerImage_1_BMP_BASE64</label>
+        <img id="js-Fingers-FingerImage_1_BMP_BASE64" style="width:200px;height:200px;"></img>
+
+        <label for="js-Fingers-FingerImage_2_BMP_BASE64">FingerImage_2_BMP_BASE64</label>
+        <img id="js-Fingers-FingerImage_2_BMP_BASE64" style="width:200px;height:200px;"></img>
+        <br>
+        <br>
+    </div>
+
+    <div class="signiture" style="background-color: antiquewhite;">
+        <h2>서명패드 테스트</h2>
+
+        <h3>Request</h3>
+        <label for="js-signiture-SystemDate">SystemDate</label>
+        <input id="js-signiture-SystemDate" value="2020-05-22">
+
+        <br><br>
+        <button style="width:150px;height:30px;background-color: rgb(100, 228, 100);" onclick=ExcuteSigniture(true)>서명패드
+            실행</button>
+        <!--
+        <button style="width:150px;height:30px;background-color: rgb(100, 228, 100);" onclick=ExcuteSigniture(true)>서명패드 실행 (jsonp)</button>
+        <button style="width:150px;height:30px;background-color: rgb(243, 115, 115);" onclick=CloseSigniture()>서명패드 종료</button>
+        -->
+        <br>
+        <h3>Response</h3>
+
+        <label for="js-signiture-Result">RESUTL : </label>
+        <textarea id="js-signiture-Result" style="width:1500px"></textarea>
+        <br>
+        <br>
+        <label for="js-signiture-Return_Val">Return_Val</label>
+        <input id="js-signiture-Return_Val" value="">
+        <label for="js-signiture-ErrMsg">ErrMsg</label>
+        <input id="js-signiture-ErrMsg" value="">
+        <br>
+        <br>
+        <label for="js-signiture-SignImage_Base64">SignImage_Base64 : </label>
+        <textarea id="js-signiture-SignImage_Base64" style="width:1000px"></textarea>
+        <br>
+        <br>
+        <label for="js-signiture-SignBMP_Base64">SignBMP_Base64 : </label>
+        <textarea id="js-signiture-SignBMP_Base64" style="width:1000px"></textarea>
+        <br>
+        <br>
+        <img id="js-signiture-SignBMPImg" style="width:200px;height:200px;"></img>
+        <br>
+
+    </div>
+
+    <div class="json_test" style="background-color:cadetblue">
+        <button style="margin: 30px;" onclick=JSONPTEST()>JSONPTEST (TESTScan)</button>
+    </div>
+
+
+    <div id="jsImage">
+        <br>
+</body>
+
+</html>

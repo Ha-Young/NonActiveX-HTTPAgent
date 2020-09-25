@@ -38,6 +38,7 @@ using System.Windows.Forms;
 
 // History: 이후 개발자 남겨주세요.
 //          2020-05-24 : jsonp 처리 추가
+//          2020-09-25 : jsonp 서버 실행 확인 추가 (server_check)
 
 namespace HY_AjaxAgent
 {
